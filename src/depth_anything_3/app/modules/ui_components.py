@@ -18,6 +18,7 @@ UI components module for Depth Anything 3 Gradio app.
 This module contains UI component definitions and layout functions.
 """
 
+import inspect
 import os
 from typing import Any, Dict, List, Tuple
 import gradio as gr
@@ -32,6 +33,16 @@ class UIComponents:
 
     def __init__(self):
         """Initialize the UI components handler."""
+
+    @staticmethod
+    def _gallery_download_kwargs() -> Dict[str, Any]:
+        """Return Gradio-version-compatible kwargs for download button support."""
+        params = inspect.signature(gr.Gallery).parameters
+        if "show_download_button" in params:
+            return {"show_download_button": True}
+        if "buttons" in params:
+            return {"buttons": ["download"]}
+        return {}
 
     def create_upload_section(self) -> Tuple[gr.Video, gr.Slider, gr.File, gr.Gallery]:
         """
@@ -55,7 +66,7 @@ class UIComponents:
             label="Preview",
             columns=4,
             height="300px",
-            show_download_button=True,
+            **self._gallery_download_kwargs(),
             object_fit="contain",
             preview=True,
             interactive=False,
